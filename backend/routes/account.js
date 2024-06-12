@@ -4,10 +4,10 @@ const router = express.Router();
 
 const z = require("zod");
 const { Account } = require("../db");
-const { authMiddlware } = require("../middleware");
+const { authMiddleware } = require("../middleware");
 const { default: mongoose } = require("mongoose");
 
-router.get("/balance", async (req, res) => {
+router.get("/balance", authMiddleware, async (req, res) => {
   const account = await Account.findOne({
     userId: req.userId,
   });
@@ -17,7 +17,7 @@ router.get("/balance", async (req, res) => {
   });
 });
 
-router.post("/transfer", authMiddlware, async (req, res) => {
+router.post("/transfer", authMiddleware, async (req, res) => {
   //transaction feature of mongoDB
   const session = await mongoose.startSession();
 
