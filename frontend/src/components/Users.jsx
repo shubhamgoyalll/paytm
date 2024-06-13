@@ -1,15 +1,23 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "./Button";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export const Users = () => {
   // Replace with backend call
-  const [users, setUsers] = useState([
-    {
-      firstName: "Shubham",
-      lastName: "Goyal",
-      _id: 1,
-    },
-  ]);
+  const [users, setUsers] = useState([]);
+  const [filter, setFilter] = useState("");
+
+  //should add debouncing here
+  useEffect(() => {
+    async function fetchData() {
+      const response = await axios.get(
+        "http://localhost:3000/api/v1/user/bulk?filter=" + filter
+      );
+      setUsers(response.data.user);
+    }
+    fetchData();
+  }, [filter]);
 
   return (
     <>
@@ -19,6 +27,9 @@ export const Users = () => {
           type="text"
           placeholder="Search users..."
           className="w-full px-2 py-1 border rounded border-slate-200"
+          onChange={(e) => {
+            setFilter(e.target.value);
+          }}
         ></input>
       </div>
       <div>
@@ -31,6 +42,7 @@ export const Users = () => {
 };
 
 function User({ user }) {
+  const navigate = useNavigate();
   return (
     <div className="flex justify-between">
       <div className="flex">
@@ -47,7 +59,12 @@ function User({ user }) {
       </div>
 
       <div className="flex flex-col justify-center h-ful">
-        <Button label={"Send Money"} />
+        <Button
+          label={"Send Money"}
+          onClick={() => {
+            navigate(`/send?id=${user._id}&name=${user.firstName}`);
+          }}
+        />
       </div>
     </div>
   );
